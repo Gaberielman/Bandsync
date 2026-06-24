@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BandSync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background: radial-gradient(circle at top, rgba(19, 235, 255, 0.13), transparent 30%),
+          radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.14), transparent 30%),
+          #09090b;
+      }
+      .glass-card {
+        backdrop-filter: blur(24px);
+        background-color: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+      }
+      .glass-panel {
+        backdrop-filter: blur(20px);
+        background-color: rgba(15, 23, 42, 0.60);
+        border: 1px solid rgba(148, 163, 184, 0.14);
+      }
+      .alert-overlay {
+        backdrop-filter: blur(12px);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-slate-100 selection:bg-cyan-400/30 selection:text-white">
+    <div class="mx-auto flex min-h-screen max-w-5xl flex-col px-4 py-6 sm:px-6 lg:px-8">
+      <div class="mb-6 flex flex-col gap-4 text-center">
+        <div class="mx-auto inline-flex items-center gap-3 rounded-full border border-cyan-400/25 bg-white/5 px-4 py-2 text-sm text-cyan-200 shadow-md shadow-cyan-500/10">
+          <span class="text-cyan-300">LIVE</span>
+          <span>BandSync for stage bands</span>
+        </div>
+        <div>
+          <h1 class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">BandSync</h1>
+          <p class="mx-auto mt-3 max-w-2xl text-base text-slate-300 sm:text-lg">
+            Real-time mobile-first sync for 4 musicians. Host controls song keys, sections, and live chord progressions.
+          </p>
+        </div>
+      </div>
+
+      <section id="joinScreen" class="glass-card mx-auto w-full max-w-2xl rounded-3xl p-6 shadow-xl shadow-cyan-500/10">
+        <div class="space-y-5">
+          <div class="space-y-3">
+            <h2 class="text-2xl font-semibold text-white">Join a Room</h2>
+            <p class="text-sm text-slate-400">Enter a shared Room ID, choose your role, and connect with the band.</p>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="space-y-2 text-sm text-slate-200">
+              Room ID
+              <input id="roomInput" class="w-full rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-cyan-400/80 focus:ring-2 focus:ring-cyan-400/20" value="JAM-1" />
+            </label>
+            <label class="space-y-2 text-sm text-slate-200">
+              Your Name
+              <input id="nameInput" class="w-full rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-cyan-400/80 focus:ring-2 focus:ring-cyan-400/20" value="Keys" />
+            </label>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="space-y-2 text-sm text-slate-200">
+              Your Role
+              <select id="roleSelect" class="w-full rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-cyan-400/80 focus:ring-2 focus:ring-cyan-400/20">
+                <option value="Keys">Keys</option>
+                <option value="Drums">Drums</option>
+                <option value="Bass">Bass</option>
+                <option value="Vocals">Vocals</option>
+              </select>
+            </label>
+            <label class="flex items-center justify-between rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-slate-200">
+              <span>Join as Host</span>
+              <input id="hostToggle" type="checkbox" class="h-5 w-5 rounded border-cyan-400 text-cyan-400 focus:ring-cyan-400/50" />
+            </label>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <button id="joinButton" type="button" class="inline-flex justify-center rounded-3xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">Join BandSync</button>
+            <p id="joinStatus" class="text-sm text-amber-300/80"></p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <script>
+      const joinButton = document.getElementById('joinButton');
+      const joinStatus = document.getElementById('joinStatus');
+      const roomInput = document.getElementById('roomInput');
+      const nameInput = document.getElementById('nameInput');
+      const roleSelect = document.getElementById('roleSelect');
+      const hostToggle = document.getElementById('hostToggle');
+
+      function navigateToRoom() {
+        const roomId = roomInput.value.trim();
+        const name = nameInput.value.trim();
+        const role = roleSelect.value;
+        const host = hostToggle.checked ? '1' : '0';
+
+        if (!roomId || !name) {
+          joinStatus.textContent = 'Room and name are required to join.';
+          return;
+        }
+
+        joinStatus.textContent = '';
+
+        const params = new URLSearchParams({
+          room: roomId,
+          name,
+          role,
+        });
+
+        const target = host === '1' ? '/host' : '/member';
+        window.location.href = `${target}?${params.toString()}`;
+      }
+
+      joinButton.addEventListener('click', navigateToRoom);
+      [roomInput, nameInput].forEach((input) => {
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            navigateToRoom();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

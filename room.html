@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BandSync Room</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background: radial-gradient(circle at top, rgba(19, 235, 255, 0.13), transparent 30%),
+          radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.14), transparent 30%),
+          #09090b;
+      }
+      .glass-card {
+        backdrop-filter: blur(24px);
+        background-color: rgba(15, 23, 42, 0.72);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+      }
+      .glass-panel {
+        backdrop-filter: blur(20px);
+        background-color: rgba(15, 23, 42, 0.60);
+        border: 1px solid rgba(148, 163, 184, 0.14);
+      }
+      .alert-overlay {
+        backdrop-filter: blur(12px);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-slate-100 selection:bg-cyan-400/30 selection:text-white">
+    <div class="mx-auto flex min-h-screen max-w-5xl flex-col px-4 py-6 sm:px-6 lg:px-8">
+      <div class="mb-6 flex flex-col gap-4 text-center">
+        <div class="mx-auto inline-flex items-center gap-3 rounded-full border border-cyan-400/25 bg-white/5 px-4 py-2 text-sm text-cyan-200 shadow-md shadow-cyan-500/10">
+          <span class="text-cyan-300">ROOM</span>
+          <span>BandSync live dashboard</span>
+        </div>
+        <div>
+          <h1 class="text-4xl font-semibold tracking-tight text-white sm:text-5xl">BandSync Room</h1>
+          <p class="mx-auto mt-3 max-w-2xl text-base text-slate-300 sm:text-lg">
+            Your live dashboard shows room state, current song, active section, and transposed chords synced across the band.
+          </p>
+        </div>
+      </div>
+
+      <section class="glass-card mx-auto w-full max-w-5xl rounded-3xl p-6 shadow-xl shadow-cyan-500/10">
+        <div class="grid gap-6 xl:grid-cols-[1.8fr_1fr]">
+          <div>
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p class="text-sm uppercase tracking-[0.25em] text-cyan-400/90">Room</p>
+                <h2 id="roomLabel" class="mt-2 text-3xl font-semibold text-white">—</h2>
+              </div>
+              <div class="flex flex-wrap gap-2 text-sm">
+                <span id="roleBadge" class="rounded-full bg-white/5 px-3 py-2 text-cyan-200 ring-1 ring-white/10">Role</span>
+                <span id="hostBadge" class="rounded-full bg-amber-400/10 px-3 py-2 text-amber-300 ring-1 ring-amber-300/20 hidden">Host</span>
+              </div>
+            </div>
+
+            <div class="mt-8 grid gap-5 sm:grid-cols-2">
+              <div class="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+                <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Song</p>
+                <p id="songTitle" class="mt-3 text-2xl font-semibold text-white">—</p>
+                <p id="songArtist" class="mt-2 text-sm text-slate-400">—</p>
+              </div>
+              <div class="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+                <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Current Key</p>
+                <p id="songKey" class="mt-3 text-4xl font-semibold text-cyan-300">—</p>
+              </div>
+            </div>
+
+            <div class="mt-8 grid gap-4 sm:grid-cols-2">
+              <div class="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+                <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Player Name</p>
+                <p id="playerName" class="mt-3 text-xl font-semibold text-white">—</p>
+              </div>
+              <div class="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+                <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Role</p>
+                <p id="playerRole" class="mt-3 text-xl font-semibold text-cyan-300">—</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-3xl border border-white/10 bg-slate-950/50 p-6 shadow-xl shadow-amber-500/10">
+            <p class="text-sm uppercase tracking-[0.2em] text-amber-300/80">Controls</p>
+            <div id="hostControls" class="mt-6 flex flex-col gap-4 hidden">
+              <button id="transposeUp" class="rounded-3xl bg-cyan-500 px-5 py-3 text-white transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40">Transpose Up</button>
+              <button id="transposeDown" class="rounded-3xl bg-cyan-500 px-5 py-3 text-white transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-40">Transpose Down</button>
+              <label class="grid gap-2 text-sm text-slate-200">
+                Select Song
+                <select id="songSelect" class="rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-cyan-400/80 focus:ring-2 focus:ring-cyan-400/20">
+                  <option value="neon-stage">Neon Stage</option>
+                  <option value="midnight-ride">Midnight Ride</option>
+                </select>
+              </label>
+              <label class="grid gap-2 text-sm text-slate-200">
+                Set Key
+                <select id="keySelect" class="rounded-3xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-cyan-400/80 focus:ring-2 focus:ring-cyan-400/20"></select>
+              </label>
+            </div>
+            <p id="controlHint" class="mt-6 text-sm text-slate-300">Connecting to room...</p>
+            <p class="mt-6 text-sm text-slate-400">Only the Host can switch sections, transpose keys, and trigger the shared band feed.</p>
+            <a href="/" class="mt-4 inline-flex rounded-3xl bg-white/5 px-5 py-3 text-sm text-white transition hover:bg-white/10">Back to Login</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="glass-panel mt-6 rounded-3xl border border-white/10 p-5 shadow-xl shadow-white/5">
+        <div class="flex flex-wrap gap-2" id="sectionTabs"></div>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" id="chordGrid"></div>
+      </section>
+
+      <section class="glass-card mt-6 rounded-3xl border border-white/10 bg-slate-950/50 p-5">
+        <p class="text-sm uppercase tracking-[0.2em] text-slate-400">Band Members Connected</p>
+        <div id="memberList" class="mt-4 grid gap-2 text-sm text-slate-300"></div>
+      </section>
+    </div>
+
+    <div id="alertOverlay" class="alert-overlay fixed inset-0 z-50 hidden items-center justify-center bg-amber-400/12 px-4 py-6 text-center backdrop-blur-xl">
+      <div class="rounded-[2rem] border border-amber-300/40 bg-amber-400/15 px-6 py-8 text-white shadow-2xl shadow-amber-500/20">
+        <p class="text-sm uppercase tracking-[0.35em] text-amber-100/90">Key Change Alert</p>
+        <h3 id="alertMessage" class="mt-4 text-2xl font-semibold text-amber-100"></h3>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const chromatic = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+      const socket = io();
+      let isHost = false;
+      let currentRoomState = null;
+      let alertTimer = null;
+
+      const roomLabel = document.getElementById('roomLabel');
+      const roleBadge = document.getElementById('roleBadge');
+      const hostBadge = document.getElementById('hostBadge');
+      const songTitle = document.getElementById('songTitle');
+      const songArtist = document.getElementById('songArtist');
+      const songKey = document.getElementById('songKey');
+      const playerName = document.getElementById('playerName');
+      const playerRole = document.getElementById('playerRole');
+      const memberList = document.getElementById('memberList');
+      const transposeUp = document.getElementById('transposeUp');
+      const transposeDown = document.getElementById('transposeDown');
+      const controlHint = document.getElementById('controlHint');
+      const sectionTabs = document.getElementById('sectionTabs');
+      const chordGrid = document.getElementById('chordGrid');
+      const alertOverlay = document.getElementById('alertOverlay');
+      const alertMessage = document.getElementById('alertMessage');
+      const params = new URLSearchParams(window.location.search);
+
+      const roomId = params.get('room');
+      const name = params.get('name');
+      const role = params.get('role');
+      const wantsHost = params.get('host') === '1';
+
+      const songSelect = document.getElementById('songSelect');
+      const keySelect = document.getElementById('keySelect');
+      const hostControls = document.getElementById('hostControls');
+
+      function setHostMode(enabled) {
+        hostBadge.classList.toggle('hidden', !enabled);
+        hostControls.classList.toggle('hidden', !enabled);
+        transposeUp.disabled = !enabled;
+        transposeDown.disabled = !enabled;
+        controlHint.textContent = enabled
+          ? 'You are the Host. Use the controls to keep the band in sync.'
+          : 'Connected as client. Waiting on the Host to update the room.';
+      }
+
+      function renderRoomState(state) {
+        currentRoomState = state;
+        roomLabel.textContent = state.roomId;
+        songTitle.textContent = state.currentSong.title;
+        songArtist.textContent = state.currentSong.artist;
+        songKey.textContent = state.currentSong.key;
+        playerName.textContent = name || 'Player';
+        playerRole.textContent = role || 'Unknown';
+        roleBadge.textContent = role || 'Role';
+
+        songSelect.value = state.currentSongId;
+        keySelect.innerHTML = chromatic
+          .map((key) => `<option value="${key}" ${key === state.currentSong.key ? 'selected' : ''}>${key}</option>`)
+          .join('');
+
+        memberList.innerHTML = state.users
+          .map((user) => {
+            const hostTag = user.isHost ? ' • Host' : '';
+            return `<div class="rounded-3xl border border-white/10 bg-slate-950/50 px-4 py-3 text-sm text-slate-200">${user.name} (${user.role})${hostTag}</div>`;
+          })
+          .join('');
+
+        sectionTabs.innerHTML = state.sections
+          .map((section) => {
+            const activeClasses = section.active
+              ? 'bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/20'
+              : 'bg-white/5 text-slate-200 ring-1 ring-white/10 hover:bg-white/10';
+            const dangerClass = section.keyChange ? 'after:content-["⚠"] after:ml-2 after:text-amber-300' : '';
+            return `<button data-section="${section.key}" class="min-w-[8rem] rounded-3xl px-4 py-3 text-sm font-semibold transition ${activeClasses} ${dangerClass}">${section.label}</button>`;
+          })
+          .join('');
+
+        chordGrid.innerHTML = state.chords
+          .map(
+            (chord) => `
+              <div class="rounded-3xl border border-white/10 bg-slate-950/60 p-5 text-center shadow-sm shadow-cyan-500/5">
+                <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Chord</p>
+                <p class="mt-3 text-3xl font-semibold text-white">${chord}</p>
+              </div>
+            `
+          )
+          .join('');
+
+        Array.from(sectionTabs.querySelectorAll('button')).forEach((button) => {
+          button.addEventListener('click', () => {
+            if (!isHost) return;
+            const section = button.dataset.section;
+            if (section && section !== state.activeSection) {
+              socket.emit('switchSection', section);
+            }
+          });
+        });
+      }
+
+      function showAlert(message) {
+        alertMessage.textContent = message;
+        alertOverlay.classList.remove('hidden');
+        clearTimeout(alertTimer);
+        alertTimer = setTimeout(() => {
+          alertOverlay.classList.add('hidden');
+        }, 3000);
+      }
+
+      if (!roomId || !name || !role) {
+        document.body.innerHTML = `<div class="min-h-screen flex items-center justify-center bg-[#09090b] px-4 text-center"><div class="rounded-3xl border border-white/10 bg-slate-950/90 p-8 text-white shadow-xl shadow-cyan-500/10"><h1 class="text-3xl font-semibold">Missing room parameters</h1><p class="mt-4 text-slate-300">Return to the login page and join through the room entry screen.</p><a href="/" class="mt-6 inline-flex rounded-3xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-cyan-400">Back to Login</a></div></div>`;
+      } else {
+        socket.emit('joinRoom', { roomId, name, role, wantsHost });
+      }
+
+      transposeUp.addEventListener('click', () => {
+        if (!isHost) return;
+        socket.emit('transpose', 'up');
+      });
+
+      transposeDown.addEventListener('click', () => {
+        if (!isHost) return;
+        socket.emit('transpose', 'down');
+      });
+
+      songSelect.addEventListener('change', () => {
+        if (!isHost) return;
+        socket.emit('setSong', { songId: songSelect.value });
+      });
+
+      keySelect.addEventListener('change', () => {
+        if (!isHost) return;
+        socket.emit('setKey', { key: keySelect.value });
+      });
+
+      socket.on('joinedRoom', ({ isHost: joinedHost, hostApproved, roomState }) => {
+        isHost = joinedHost;
+        setHostMode(isHost);
+        renderRoomState(roomState);
+        if (hostApproved) {
+          controlHint.textContent = 'Connected as Host. Use the dashboard to keep the song locked in.';
+        } else if (wantsHost) {
+          controlHint.textContent = 'Host already exists. You joined as Client.';
+        }
+      });
+
+      socket.on('joinError', (message) => {
+        controlHint.textContent = message;
+      });
+
+      socket.on('roomUpdated', (state) => {
+        renderRoomState(state);
+      });
+
+      socket.on('keyChangeAlert', ({ message }) => {
+        showAlert(message);
+      });
+
+      socket.on('connect_error', () => {
+        controlHint.textContent = 'Unable to connect to BandSync server.';
+      });
+    </script>
+  </body>
+</html>
