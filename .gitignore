@@ -1,0 +1,28 @@
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Node legacy app dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Local tooling/runtime files
+.agents/
+.codex/
+
+# Logs and environment files
+*.log
+.env
+.env.*
+

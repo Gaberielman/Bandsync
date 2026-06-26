@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BandSync Client</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body data-view="member" class="min-h-screen bg-[#09090b] text-slate-100">
+    <main class="mx-auto flex min-h-screen max-w-5xl flex-col px-4 py-6">
+      <header class="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">Client</p>
+          <h1 class="mt-2 text-4xl font-black text-white">BandSync Stage View</h1>
+          <p id="connectionStatus" class="mt-2 text-sm text-cyan-200">Connecting...</p>
+        </div>
+        <div class="rounded-lg border border-white/10 bg-slate-950/80 px-4 py-3">
+          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Room</p>
+          <p id="roomLabel" class="text-2xl font-black text-white">404</p>
+        </div>
+      </header>
+
+      <section class="mt-6 grid gap-4 lg:grid-cols-[1fr_18rem]">
+        <div class="grid gap-4 sm:grid-cols-3">
+          <article class="rounded-lg border border-white/10 bg-slate-950/80 p-4">
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Song</p>
+            <p id="songTitle" class="mt-2 text-2xl font-black text-white">Waiting</p>
+            <p id="songArtist" class="text-sm text-slate-400">BandSync</p>
+          </article>
+          <article class="rounded-lg border border-white/10 bg-slate-950/80 p-4">
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Key</p>
+            <p id="songKey" class="mt-2 text-4xl font-black text-cyan-300">--</p>
+          </article>
+          <article class="rounded-lg border border-white/10 bg-slate-950/80 p-4">
+            <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Section</p>
+            <p id="currentSection" class="mt-2 text-3xl font-black text-amber-300">Standby</p>
+          </article>
+        </div>
+
+        <aside class="rounded-lg border border-white/10 bg-slate-950/80 p-4">
+          <p id="playerName" class="text-lg font-bold text-white">Musician</p>
+          <p id="playerRole" class="text-sm text-slate-400">KEYS</p>
+        </aside>
+      </section>
+
+      <section id="chordGrid" class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"></section>
+    </main>
+
+    <div id="keyChangeOverlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-amber-400/20 px-4 text-center backdrop-blur-xl">
+      <div class="rounded-lg border border-amber-200/50 bg-amber-300/20 p-8 shadow-2xl shadow-amber-500/30">
+        <p class="text-sm font-bold uppercase tracking-[0.25em] text-amber-100">Key Change Alert</p>
+        <p id="keyChangeNotice" class="mt-4 text-4xl font-black text-white"></p>
+      </div>
+    </div>
+
+    <script src="/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/host",
+      "destination": "/host.html"
+    },
+    {
+      "source": "/member",
+      "destination": "/member.html"
+    },
+    {
+      "source": "/room",
+      "destination": "/member.html"
+    }
+  ]
+}
