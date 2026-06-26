@@ -13,19 +13,23 @@ BandSync is a mobile-first real-time synchronization app for live bands. A Host 
 
 ## Local Run
 
-Start the Spring Boot application from VS Code using:
+Start the Spring Boot backend:
 
-```text
-Run and Debug -> Run BandSync Spring Boot
+```bash
+mvn spring-boot:run
 ```
 
-Then open:
+Then open the backend health check:
 
 ```text
-http://localhost:8080
+http://localhost:8080/health
 ```
 
-Use the same room ID on the Host and Client screens.
+For local frontend testing, serve the `public/` folder with any static server and keep `public/config.js` pointed at:
+
+```js
+window.BANDSYNC_BACKEND_URL = 'http://localhost:8080';
+```
 
 ## Deploy
 
